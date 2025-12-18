@@ -52,9 +52,10 @@
 </head>
 <body class="h-screen w-full flex flex-col items-center justify-center overflow-hidden text-white selection:bg-pink-500 selection:text-white">
 
-    <!-- 背景音樂 (預設使用 Google 的流水聲，穩定且放鬆) -->
-    <!-- 您可以更換 src 為任何 mp3 連結 -->
-    <audio id="bgMusic" loop preload="auto">
+    <!-- 背景音樂 -->
+    <!-- 更新：加入 MP3 格式以支援 iOS/Safari，並保留 OGG 作為備用 -->
+    <audio id="bgMusic" loop preload="auto" playsinline>
+        <source src="https://cdn.pixabay.com/audio/2022/03/09/audio_c8c8a73467.mp3" type="audio/mpeg">
         <source src="https://actions.google.com/sounds/v1/water/gentle_stream.ogg" type="audio/ogg">
     </audio>
 
@@ -245,8 +246,15 @@
             // 播放音樂 (如果使用者允許)
             if (isMusicEnabled) {
                 bgMusic.volume = 0.5; // 設置音量為 50%
+                
+                // 強制載入並播放，確保在 iOS 上能運作
+                // 有些瀏覽器需要先 load 才能 play
+                bgMusic.load();
+                
                 bgMusic.play().catch(error => {
-                    console.log("Autoplay prevented:", error);
+                    console.log("Autoplay prevented or network error:", error);
+                    // 如果播放失敗，可能是使用者還沒互動過，
+                    // 或者是外部連結失效。這裡可以加入重試邏輯，但為了簡單，先 log 出來。
                 });
             }
 
