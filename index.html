@@ -1,134 +1,234 @@
 <!DOCTYPE html>
 <html lang="zh-TW">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>4-7-8 呼吸法視覺引導</title>
-    <style>
-        body {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            height: 100vh;
-            margin: 0;
-            background-color: #2c3e50;
-            color: white;
-            font-family: sans-serif;
-        }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>4-7-8 呼吸放鬆引導</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;700&display=swap');
 
-        /* 呼吸圓圈的樣式 */
-        .circle-container {
-            position: relative;
-            width: 300px;
-            height: 300px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
+        body {
+            font-family: 'Noto Sans TC', sans-serif;
+            background: linear-gradient(135deg, #1a1c2c 0%, #4a192c 100%);
+            background-size: 400% 400%;
+            animation: gradientBG 15s ease infinite;
+        }
 
-        .circle {
-            width: 100%;
-            height: 100%;
-            background-color: #3498db;
-            border-radius: 50%;
-            position: absolute;
-            z-index: 1;
-            transform: scale(0.3); /* 初始狀態：縮小（吐氣完的狀態） */
-            opacity: 0.8;
-            transition-timing-function: ease-in-out;
-        }
+        @keyframes gradientBG {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
 
-        /* 文字樣式 */
-        .instruction {
-            z-index: 2;
-            font-size: 2rem;
-            font-weight: bold;
-            text-align: center;
-            text-shadow: 1px 1px 2px black;
-        }
+        .breath-circle {
+            box-shadow: 0 0 20px rgba(255, 255, 255, 0.1), inset 0 0 20px rgba(255, 255, 255, 0.1);
+            transition-property: transform, background-color, box-shadow;
+            will-change: transform;
+        }
 
-        .timer {
-            margin-top: 20px;
-            font-size: 1.5rem;
-            color: #ecf0f1;
-        }
+        /* 呼吸狀態的特定樣式 */
+        .inhale-state {
+            box-shadow: 0 0 40px rgba(100, 200, 255, 0.6), inset 0 0 30px rgba(100, 200, 255, 0.4);
+            background-color: rgba(56, 189, 248, 0.3); /* Sky blue tint */
+        }
 
-        button {
-            margin-top: 40px;
-            padding: 10px 20px;
-            font-size: 1.2rem;
-            cursor: pointer;
-            background-color: #27ae60;
-            color: white;
-            border: none;
-            border-radius: 5px;
-        }
-        button:hover { background-color: #2ecc71; }
-    </style>
+        .hold-state {
+            box-shadow: 0 0 50px rgba(255, 255, 255, 0.8), inset 0 0 40px rgba(255, 255, 255, 0.5);
+            background-color: rgba(255, 255, 255, 0.2);
+        }
+
+        .exhale-state {
+            box-shadow: 0 0 20px rgba(255, 255, 255, 0.1), inset 0 0 10px rgba(255, 255, 255, 0.1);
+            background-color: rgba(30, 41, 59, 0.5);
+        }
+
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+    </style>
 </head>
-<body>
+<body class="h-screen w-full flex flex-col items-center justify-center overflow-hidden text-white selection:bg-pink-500 selection:text-white">
 
-    <div class="circle-container">
-        <div class="circle" id="breathCircle"></div>
-        <div class="instruction" id="text">準備</div>
-    </div>
-    
-    <div class="timer" id="countdown">點擊下方按鈕開始</div>
-    <button onclick="startBreathing()">開始練習</button>
+    <!-- 主容器 -->
+    <div class="relative w-full max-w-md mx-auto p-6 flex flex-col items-center">
+        
+        <!-- 標題區域 -->
+        <div class="text-center mb-8 z-10">
+            <h1 class="text-3xl font-light tracking-widest text-white/90 mb-2">4-7-8 呼吸法</h1>
+            <p class="text-sm text-white/60 font-light">放鬆神經系統，減輕焦慮</p>
+        </div>
 
-    <script>
-        const circle = document.getElementById('breathCircle');
-        const text = document.getElementById('text');
-        const countdownDisplay = document.getElementById('countdown');
-        let isRunning = false;
+        <!-- 呼吸動畫區域 -->
+        <div class="relative w-72 h-72 sm:w-80 sm:h-80 flex items-center justify-center mb-10">
+            <!-- 外圈軌道 (裝飾用) -->
+            <div class="absolute w-full h-full rounded-full border border-white/10 scale-100"></div>
+            <div class="absolute w-[80%] h-[80%] rounded-full border border-white/5 scale-100"></div>
 
-        function startBreathing() {
-            if (isRunning) return;
-            isRunning = true;
-            document.querySelector('button').style.display = 'none'; // 隱藏按鈕
-            
-            runCycle();
-        }
+            <!-- 核心呼吸圓圈 -->
+            <div id="breathCircle" class="breath-circle w-full h-full rounded-full bg-slate-800/50 backdrop-blur-sm absolute transform scale-30 exhale-state"></div>
 
-        function runCycle() {
-            // 1. 吸氣 (4秒)
-            text.innerText = "吸氣 (鼻)";
-            circle.style.transition = "transform 4s ease-in-out";
-            circle.style.transform = "scale(1.0)"; // 圓圈變大
-            startCountdown(4, () => {
-                
-                // 2. 憋氣 (7秒)
-                text.innerText = "憋氣 (停)";
-                // 保持圓圈大小不變，不需要 transition 變化
-                startCountdown(7, () => {
-                    
-                    // 3. 吐氣 (8秒)
-                    text.innerText = "吐氣 (口)";
-                    circle.style.transition = "transform 8s ease-in-out";
-                    circle.style.transform = "scale(0.3)"; // 圓圈變小
-                    startCountdown(8, () => {
-                        // 循環結束，立刻開始下一輪
-                        runCycle();
-                    });
-                });
-            });
-        }
+            <!-- 中心文字與計時 -->
+            <div class="relative z-10 flex flex-col items-center justify-center text-center pointer-events-none">
+                <div id="instructionText" class="text-4xl font-bold tracking-wider drop-shadow-lg mb-2 transition-all duration-500">準備</div>
+                <div id="timerDisplay" class="text-2xl font-light text-white/80 font-mono">0</div>
+            </div>
+        </div>
 
-        function startCountdown(duration, callback) {
-            let timeLeft = duration;
-            countdownDisplay.innerText = timeLeft;
-            
-            const timer = setInterval(() => {
-                timeLeft--;
-                if (timeLeft > 0) {
-                    countdownDisplay.innerText = timeLeft;
-                } else {
-                    clearInterval(timer);
-                    callback();
-                }
-            }, 1000);
-        }
-    </script>
+        <!-- 控制按鈕 -->
+        <div class="z-10 flex gap-4">
+            <button id="startBtn" onclick="toggleBreathing()" class="glass-panel hover:bg-white/20 text-white font-medium py-3 px-8 rounded-full transition-all duration-300 transform active:scale-95 shadow-lg flex items-center gap-2 group">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="group-hover:text-green-400 transition-colors"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
+                <span id="btnText">開始練習</span>
+            </button>
+            
+            <button id="resetBtn" onclick="resetExercise()" class="hidden glass-panel hover:bg-white/20 text-white/80 hover:text-red-300 py-3 px-4 rounded-full transition-all duration-300 shadow-lg" title="重置">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74-2.74L3 12"></path></svg>
+            </button>
+        </div>
+
+        <!-- 狀態指示條 -->
+        <div class="mt-8 flex gap-2">
+            <div id="dot1" class="w-2 h-2 rounded-full bg-white/20 transition-colors duration-500"></div>
+            <div id="dot2" class="w-2 h-2 rounded-full bg-white/20 transition-colors duration-500"></div>
+            <div id="dot3" class="w-2 h-2 rounded-full bg-white/20 transition-colors duration-500"></div>
+        </div>
+
+        <div class="mt-8 text-xs text-white/30 max-w-xs text-center leading-relaxed">
+            <p>鼻吸 4 秒 · 屏氣 7 秒 · 口吐 8 秒</p>
+        </div>
+    </div>
+
+    <script>
+        const circle = document.getElementById('breathCircle');
+        const instructionText = document.getElementById('instructionText');
+        const timerDisplay = document.getElementById('timerDisplay');
+        const startBtn = document.getElementById('startBtn');
+        const btnText = document.getElementById('btnText');
+        const resetBtn = document.getElementById('resetBtn');
+        const dots = [document.getElementById('dot1'), document.getElementById('dot2'), document.getElementById('dot3')];
+
+        let isRunning = false;
+        let controller = new AbortController(); // 用於中斷非同步操作
+
+        // 輔助函數：等待指定毫秒數，並支援中斷
+        const wait = (ms, signal) => {
+            return new Promise((resolve, reject) => {
+                const timeout = setTimeout(() => resolve(), ms);
+                if (signal) {
+                    signal.addEventListener('abort', () => {
+                        clearTimeout(timeout);
+                        reject(new DOMException('Aborted', 'AbortError'));
+                    });
+                }
+            });
+        };
+
+        // 輔助函數：更新 UI 狀態
+        function updateUI(text, scale, durationCSS, className, activeDotIndex) {
+            instructionText.innerText = text;
+            circle.style.transition = `transform ${durationCSS}s linear, background-color 2s ease, box-shadow 2s ease`;
+            circle.style.transform = `scale(${scale})`;
+            
+            // 移除舊狀態類別
+            circle.classList.remove('inhale-state', 'hold-state', 'exhale-state');
+            // 加入新狀態類別
+            if(className) circle.classList.add(className);
+
+            // 更新下方小點
+            dots.forEach((dot, index) => {
+                dot.style.backgroundColor = index === activeDotIndex ? 'rgba(255,255,255,0.9)' : 'rgba(255,255,255,0.2)';
+            });
+        }
+
+        // 倒數計時邏輯
+        async function runCountdown(seconds, signal) {
+            for (let i = 1; i <= seconds; i++) {
+                // 為了讓動畫平滑，我們顯示經過的時間或剩餘時間
+                // 這裡顯示 1...2...3... 更加直覺
+                timerDisplay.innerText = i; 
+                await wait(1000, signal);
+            }
+        }
+
+        async function breathingLoop() {
+            try {
+                const signal = controller.signal;
+
+                while (isRunning) {
+                    // 1. 吸氣 (4秒)
+                    updateUI("吸氣", 1.0, 4, 'inhale-state', 0);
+                    await runCountdown(4, signal);
+
+                    // 2. 憋氣 (7秒)
+                    updateUI("憋氣", 1.0, 0, 'hold-state', 1); // scale 保持 1.0
+                    // 憋氣時稍微有些微的縮放效果讓畫面不至於靜止太久
+                    circle.style.transition = "transform 7s ease-in-out";
+                    circle.style.transform = "scale(0.95)"; 
+                    
+                    await runCountdown(7, signal);
+
+                    // 3. 吐氣 (8秒)
+                    updateUI("吐氣", 0.3, 8, 'exhale-state', 2);
+                    await runCountdown(8, signal);
+                }
+            } catch (error) {
+                if (error.name === 'AbortError') {
+                    console.log('Breathing stopped');
+                } else {
+                    console.error(error);
+                }
+            }
+        }
+
+        function toggleBreathing() {
+            if (isRunning) {
+                // 暫停目前沒實作，直接做成重置比較符合呼吸練習的邏輯
+                resetExercise();
+            } else {
+                startExercise();
+            }
+        }
+
+        function startExercise() {
+            isRunning = true;
+            controller = new AbortController();
+            
+            // UI 更新
+            startBtn.classList.add('bg-white/10');
+            startBtn.innerHTML = `
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-red-400"><rect x="6" y="4" width="4" height="16"></rect><rect x="14" y="4" width="4" height="16"></rect></svg>
+                <span>停止</span>
+            `;
+            resetBtn.classList.remove('hidden');
+            
+            breathingLoop();
+        }
+
+        function resetExercise() {
+            isRunning = false;
+            controller.abort(); // 中斷目前的計時循環
+
+            // 重置 UI
+            circle.style.transition = "transform 0.5s ease-out";
+            circle.style.transform = "scale(0.3)";
+            circle.classList.remove('inhale-state', 'hold-state', 'exhale-state');
+            circle.classList.add('exhale-state'); // 回到預設暗色
+            
+            instructionText.innerText = "準備";
+            timerDisplay.innerText = "0";
+            
+            startBtn.classList.remove('bg-white/10');
+            startBtn.innerHTML = `
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="group-hover:text-green-400 transition-colors"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
+                <span id="btnText">開始練習</span>
+            `;
+            resetBtn.classList.add('hidden');
+
+            dots.forEach(dot => dot.style.backgroundColor = 'rgba(255,255,255,0.2)');
+        }
+    </script>
 </body>
 </html>
