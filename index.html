@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>4-7-8 呼吸法視覺引導</title>
+    <style>
+        body {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #2c3e50;
+            color: white;
+            font-family: sans-serif;
+        }
+
+        /* 呼吸圓圈的樣式 */
+        .circle-container {
+            position: relative;
+            width: 300px;
+            height: 300px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .circle {
+            width: 100%;
+            height: 100%;
+            background-color: #3498db;
+            border-radius: 50%;
+            position: absolute;
+            z-index: 1;
+            transform: scale(0.3); /* 初始狀態：縮小（吐氣完的狀態） */
+            opacity: 0.8;
+            transition-timing-function: ease-in-out;
+        }
+
+        /* 文字樣式 */
+        .instruction {
+            z-index: 2;
+            font-size: 2rem;
+            font-weight: bold;
+            text-align: center;
+            text-shadow: 1px 1px 2px black;
+        }
+
+        .timer {
+            margin-top: 20px;
+            font-size: 1.5rem;
+            color: #ecf0f1;
+        }
+
+        button {
+            margin-top: 40px;
+            padding: 10px 20px;
+            font-size: 1.2rem;
+            cursor: pointer;
+            background-color: #27ae60;
+            color: white;
+            border: none;
+            border-radius: 5px;
+        }
+        button:hover { background-color: #2ecc71; }
+    </style>
+</head>
+<body>
+
+    <div class="circle-container">
+        <div class="circle" id="breathCircle"></div>
+        <div class="instruction" id="text">準備</div>
+    </div>
+    
+    <div class="timer" id="countdown">點擊下方按鈕開始</div>
+    <button onclick="startBreathing()">開始練習</button>
+
+    <script>
+        const circle = document.getElementById('breathCircle');
+        const text = document.getElementById('text');
+        const countdownDisplay = document.getElementById('countdown');
+        let isRunning = false;
+
+        function startBreathing() {
+            if (isRunning) return;
+            isRunning = true;
+            document.querySelector('button').style.display = 'none'; // 隱藏按鈕
+            
+            runCycle();
+        }
+
+        function runCycle() {
+            // 1. 吸氣 (4秒)
+            text.innerText = "吸氣 (鼻)";
+            circle.style.transition = "transform 4s ease-in-out";
+            circle.style.transform = "scale(1.0)"; // 圓圈變大
+            startCountdown(4, () => {
+                
+                // 2. 憋氣 (7秒)
+                text.innerText = "憋氣 (停)";
+                // 保持圓圈大小不變，不需要 transition 變化
+                startCountdown(7, () => {
+                    
+                    // 3. 吐氣 (8秒)
+                    text.innerText = "吐氣 (口)";
+                    circle.style.transition = "transform 8s ease-in-out";
+                    circle.style.transform = "scale(0.3)"; // 圓圈變小
+                    startCountdown(8, () => {
+                        // 循環結束，立刻開始下一輪
+                        runCycle();
+                    });
+                });
+            });
+        }
+
+        function startCountdown(duration, callback) {
+            let timeLeft = duration;
+            countdownDisplay.innerText = timeLeft;
+            
+            const timer = setInterval(() => {
+                timeLeft--;
+                if (timeLeft > 0) {
+                    countdownDisplay.innerText = timeLeft;
+                } else {
+                    clearInterval(timer);
+                    callback();
+                }
+            }, 1000);
+        }
+    </script>
+</body>
+</html>
