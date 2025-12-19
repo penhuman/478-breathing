@@ -38,6 +38,8 @@ JavaScript (ES6+): 使用 Async/Await 與 Promise 處理精確的計時動畫。
 
 Tailwind CSS (CDN): 快速構建樣式與動畫效果。
 
+https://penhuman.github.io/478-breathing/
+
 📄 授權
 
 此專案採用 MIT License 開源授權，歡迎自由使用與修改。
